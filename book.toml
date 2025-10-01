@@ -1,0 +1,5 @@
+[book]
+authors = ["Petru Vamanu"]
+language = "ro"
+src = "src"
+title = "Laborator ACSO"
