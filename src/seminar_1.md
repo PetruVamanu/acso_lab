@@ -20,7 +20,7 @@
 
 ### #2 Creati tabelul de adevar pentru functia:
 
-$`F(A, B, C, D) = (A \land \neg B \land C \land D) \lor (\neg A \land B \land C \land \neg D) \lor (A \land B \land \neg C \land D)`$
+$$F(A, B, C, D) = (A \land \neg B \land C \land D) \lor (\neg A \land B \land C \land \neg D) \lor (A \land B \land \neg C \land D)$$
 
 ### #3 Minimizati folosind proprietatile din tabel functiile:
 - $F(A, B, C, D, E) = (A \land B \land C) \lor (\neg D \land E) \lor (A \land B \land C) \lor (A \land B \land C \land D)$
