@@ -3,9 +3,7 @@
 ## Mijloace de comunicare
 - serverul Discord al disciplinei
     - cursuri, anunțuri etc.
-- pagina web a disciplinei
-    - https://edu.info.uaic.ro/arhitectura-calculatoarelor-sisisteme-
-de-operare/
+- [Pagina web a disciplinei](https://edu.info.uaic.ro/arhitectura-calculatoarelor-sisisteme-de-operare)
     - pentru informații cu caracter public
 - adresa de email de la facultate
     - reprezintă o cale oficială de comunicare

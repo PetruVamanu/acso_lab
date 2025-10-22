@@ -35,5 +35,4 @@
 - g) Σ(8, 12, 21, 23, 24, 28) + Σ∗(2, 6, 9, 10, 14, 18, 22, 25, 26, 30)
 
 
-- Minimizarile pot fi verificate aici:
-    - http://www.32x8.com/index.html
+Minimizarile pot fi verificate [aici](http://www.32x8.com/index.html)
