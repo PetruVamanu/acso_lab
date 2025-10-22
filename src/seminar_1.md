@@ -1,4 +1,5 @@
 # Seminar 1
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 ## Exercitii
 
@@ -20,11 +21,12 @@
 
 ### #2 Creati tabelul de adevar pentru functia:
 
-$$F(A, B, C, D) = (A \land \neg B \land C \land D) \lor (\neg A \land B \land C \land \neg D) \lor (A \land B \land \neg C \land D)$$
+$F(A, B, C, D) = (A \wedge \neg B \wedge C \wedge D) \vee (\neg A \wedge B \wedge C \wedge \neg D) \vee (A \wedge B \wedge \neg C \wedge D)$
 
 ### #3 Minimizati folosind proprietatile din tabel functiile:
-- $F(A, B, C, D, E) = (A \land B \land C) \lor (\neg D \land E) \lor (A \land B \land C) \lor (A \land B \land C \land D)$
-- $F(A, B, C, D, E) = (A \land \neg B \land C) \lor (B \land C \land D) \lor (\neg A \land E) \lor (A \land \neg B \land \neg C) \lor (B \land C \land D) \lor (A \land E)$
-- $F(A, B, C, D, E, F) = (A \land B \land \neg C) \lor (D \land E \land F) \lor (\neg A \land B \land D) \lor (A \land \neg B \land C \land E) \lor (A \land B \land \neg C) \lor (D \land \neg E \land F) \lor (A \land \neg B \land \neg C \land E)$
+
+$F(A, B, C, D, E) = (A \wedge B \wedge C) \vee (\neg D \wedge E) \vee (A \wedge B \wedge C) \vee (A \wedge B \wedge C \wedge D)$
+- $F(A, B, C, D, E) = (A \wedge \neg B \wedge C) \vee (B \wedge C \wedge D) \vee (\neg A \wedge E) \vee (A \wedge \neg B \wedge \neg C) \vee (B \wedge C \wedge D) \vee (A \wedge E)$
+- $F(A, B, C, D, E, F) = (A \wedge B \wedge \neg C) \vee (D \wedge E \wedge F) \vee (\neg A \wedge B \wedge D) \vee (A \wedge \neg B \wedge C \wedge E) \vee (A \wedge B \wedge \neg C) \vee (D \wedge \neg E \wedge F) \vee (A \wedge \neg B \wedge \neg C \wedge E)$
 
 ### #4 Avem o placa de ram care lucreaza 20% din timpul de lucru al sistemului de calcul. Cu ce procentaj va deveni sistemul mai rapid daca inlocuim placa cu una care lucreaza de 3 ori mai repede?
