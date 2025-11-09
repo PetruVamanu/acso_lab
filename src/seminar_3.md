@@ -1,6 +1,7 @@
 # Seminar 3
 
 ## Exercitii
+
 ### #1 Arătați că următoarele mulțimi de tipuri deporți sunt seturi de generatori:
 - NOT, AND
 - NOT, OR

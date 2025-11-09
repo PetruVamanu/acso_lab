@@ -6,4 +6,7 @@
     - [Seminar 2](./seminar_2.md)
     - [Seminar 3](./seminar_3.md)
     - [Seminar 4](./seminar_4.md)
+    - [Seminar 5](./seminar_5.md)
+    - [Seminar 6](./seminar_6.md)
+    - [Seminar 7](./seminar_7.md)
 - [Laboator](./laborator.md)

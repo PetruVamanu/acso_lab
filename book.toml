@@ -3,3 +3,8 @@ authors = ["Petru Vamanu"]
 language = "ro"
 src = "src"
 title = "Laborator ACSO"
+
+[output.html]
+mathjax-support = true # Use this for KaTeX/MathJax
+
+[preprocessor.katex]
