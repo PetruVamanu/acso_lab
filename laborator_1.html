@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Administrativ - Laborator ACSO</title>
+        <title>Laboator 1 - Laborator ACSO</title>
 
 
         <!-- Custom HTML head -->
@@ -184,64 +184,143 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="administrativ"><a class="header" href="#administrativ">Administrativ</a></h1>
-<h2 id="mijloace-de-comunicare"><a class="header" href="#mijloace-de-comunicare">Mijloace de comunicare</a></h2>
+                        <h1 id="laboator-1"><a class="header" href="#laboator-1">Laboator 1</a></h1>
+<h2 id="registri-x86"><a class="header" href="#registri-x86">Registri x86</a></h2>
+<p>Arhitectura x86 are:</p>
 <ul>
-<li>serverul Discord al disciplinei
+<li>8 registri de uz general (GPR - General-Purpose Registers )</li>
+<li>1 registru cu flag-uri/indicatori de conditii (EFLAGS)</li>
+<li>1 registru pointer la instructiunea urmatoare ce va fi executata (IP - Instruction Pointer)</li>
+<li>alti registri</li>
+</ul>
+<h3 id="registri-general-purpose"><a class="header" href="#registri-general-purpose">Registri General Purpose</a></h3>
 <ul>
-<li>cursuri, anunțuri etc.</li>
+<li>AX - accumulator - folosit in operatii aritmetice</li>
+<li>CX - counter - folosit in bucle si in instructiuni de shiftare si rotatie</li>
+<li>DX - data - folosit in operatii aritmetice si I/O</li>
+<li>BX - base - folosit ca un pointer la date</li>
+<li>SP - stack pointer - pointer la varful stivei</li>
+<li>BP - stack base pointer - pointer la baza stivei</li>
+<li>SI - source index - pointer la sursa in operatii stream</li>
+<li>DI - destination index - pointer la destinatie in operatii stream</li>
+</ul>
+<h3 id="eflags"><a class="header" href="#eflags">(E)FLAGS</a></h3>
+<p>Este un registru de 32 de biti care indica “starea” procesorului la un moment dat. Doar o parte din cei 32 de biti sunt folositi pentru a furniza informatii despre rezultatul ultimei operatii executate de procesor. Bitii din EFLAGS se mai numesc si indicatori:</p>
+<ul>
+<li>CF - carry flag (transport) - are valoarea 1 (este setat) daca dupa ultima operatie a aparut transport, 0 (nu este setat) altfel</li>
+<li>PF - parity flag (paritate) - are valoarea 1 daca numarul de biti de 1 din rezultatul ultimei operatii este par</li>
+<li>ZF - zero flag - are valoarea 1 daca rezultatul ultimei operatii a fost 0</li>
+<li>SF - sign flag (semn) - are valoarea 1 daca rezultatul ultimei operatii a fost negativ (bitul cel mai semnificativ este 1)</li>
+<li>OF - overflow flag (depasire) - are valoarea 1 daca ultima operatie a produs depasire aritmetica</li>
+</ul>
+<p><a href="https://en.wikipedia.org/wiki/FLAGS_register">Mai multe informatii</a></p>
+<h3 id="adrese"><a class="header" href="#adrese">Adrese</a></h3>
+<p>Orice adresa este formata din doua componente: segment si offset (deplasament), notatia uzuala fiind segment:offset.</p>
+<p>Pentru partea de offset exista mai multe variante:</p>
+<ul>
+<li>Constanta numerica
+<ul>
+<li>[100]</li>
 </ul>
 </li>
-<li><a href="https://edu.info.uaic.ro/arhitectura-calculatoarelor-sisisteme-de-operare">Pagina web a disciplinei</a>
+<li>Valoarea unui registru general pe 32 biti
 <ul>
-<li>pentru informații cu caracter public</li>
+<li>[EAX] (se poate scrie si cu litere mici)</li>
 </ul>
 </li>
-<li>adresa de email de la facultate
+<li>Suma dintre valoarea unui registru general pe 32 biti si o constanta
 <ul>
-<li>reprezintă o cale oficială de comunicare</li>
+<li>[EBX+5]</li>
+</ul>
+</li>
+<li>Suma a doi registri generali pe 32 biti
+<ul>
+<li>[ECX+ESI]</li>
+</ul>
+</li>
+<li>Combinatia celor 2 variante anterioare: suma a 2 registri si a unei constante
+<ul>
+<li>[EDX+EBP+14]</li>
+</ul>
+</li>
+<li>Suma a 2 registri, dintre care unul inmultit cu 2, 4, sau 8, la care se poate aduna o constanta
+<ul>
+<li>[EAX+EDI*2]</li>
+<li>[ECX+EDX*4+5]</li>
 </ul>
 </li>
 </ul>
-<h2 id="evaluare"><a class="header" href="#evaluare">Evaluare</a></h2>
-<h3 id="examinare-pe-parcurs"><a class="header" href="#examinare-pe-parcurs">Examinare pe parcurs</a></h3>
+<h2 id="instructiuni"><a class="header" href="#instructiuni">Instructiuni</a></h2>
+<p>Instructiunile ASM au urmatorul format:</p>
+<pre><code>[eticheta]   mnemonic/operatie   [operanzi]
+</code></pre>
+<h2 id="mov---atribuire"><a class="header" href="#mov---atribuire">MOV - atribuire</a></h2>
+<p>Sintaxa: mov destinatie, sursa</p>
+<p>Efect: pune in destinatie valoarea din sursa.</p>
+<p>Destinatia, respectiv sursa, pot fi:</p>
 <ul>
-<li>test scris din materia de curs - prima jumătate a
-semestrului (săptămâna 8)</li>
-<li>test practic la laborator (limbaj de asamblare)
+<li>registru, registru.
 <ul>
-<li>testul practic NU poate fi susținut din nou în restanțe</li>
+<li>mov eax, ebx</li>
+<li>mov al, bh</li>
+</ul>
+</li>
+<li>registru, adresa de memorie
+<ul>
+<li>mov bl, [eax]</li>
+</ul>
+</li>
+<li>adresa de memorie, registru
+<ul>
+<li>mov [esi], esx</li>
+</ul>
+</li>
+<li>registru, constanta numerica
+<ul>
+<li>mov ah, 0</li>
+</ul>
+</li>
+<li>memorie, constanta numerica
+<ul>
+<li>mov [eax], 3</li>
 </ul>
 </li>
 </ul>
-<h3 id="examinare-în-sesiune"><a class="header" href="#examinare-în-sesiune">Examinare în sesiune</a></h3>
-<ul>
-<li>test scris din materia de curs - a doua jumătate a
-semestrului</li>
-</ul>
-<h3 id="promovare"><a class="header" href="#promovare">Promovare</a></h3>
-<ul>
-<li>toate testele trebuie susținute
-<ul>
-<li>indiferent de rezultatele la celelalte teste</li>
-</ul>
-</li>
-<li>cerinţă eliminatorie pentru susţinerea
-<ul>
-<li>primelor două teste - prezenţa la laborator</li>
-<li>cel mult 2 absenţe în fiecare jumătate de semestru</li>
-</ul>
-</li>
-<li>restanță/mărire - se pot susține din nou cele
-două teste scrise (sau doar unul)</li>
-</ul>
+<p>Ex. 1:</p>
+<pre><code>#include &lt;stdio.h&gt;
+
+void main() {
+  _asm {
+    mov eax, 0;
+    mov ah, 1;
+  }
+}
+</code></pre>
+<p>Ex. 2 - eroare compilare</p>
+<pre><code>#include &lt;stdio.h&gt;
+
+void main() {
+  int i = 0;
+  _asm {
+    mov ax, i;
+  }
+}
+</code></pre>
+<h2 id="dimensiunea-operanzilor--directiva-de-size"><a class="header" href="#dimensiunea-operanzilor--directiva-de-size">Dimensiunea operanzilor / directiva de size:</a></h2>
+<pre><code>mov byte ptr [eax], 5;   //afecteaza 1 octet
+mov word ptr [eax], 5;   //afecteaza 2 octeti
+mov dword ptr [eax], 5;  //afecteaza 4 octeti (double word)
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="laborator.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
 
-                            <a rel="next prefetch" href="seminar.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="laborator_2.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -251,8 +330,11 @@ două teste scrise (sau doar unul)</li>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="laborator.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
 
-                    <a rel="next prefetch" href="seminar.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="laborator_2.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
