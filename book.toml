@@ -5,6 +5,6 @@ src = "src"
 title = "Laborator ACSO"
 
 [output.html]
-mathjax-support = true # Use this for KaTeX/MathJax
+mathjax-support = true
 
 [preprocessor.katex]
