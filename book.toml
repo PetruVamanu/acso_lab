@@ -5,8 +5,4 @@ src = "src"
 title = "Laborator ACSO"
 
 [output.html]
-
-[preprocessor.katex]
-render-options.displayMode = true
-render-options.fleqn = true
-render-options.throwOnError = false
+mathjax-support = true
