@@ -19,11 +19,7 @@ jobs:
           mdbook-version: latest
 
       - name: Install mdbook-katex
-        uses: actions-rs/install@v0.1
-        with:
-          crate: mdbook-katex
-          version: latest
-          use-tool-cache: true
+        run: cargo install mdbook-katex
 
       - run: mdbook build
       - name: Deploy
