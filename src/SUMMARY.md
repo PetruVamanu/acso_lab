@@ -10,3 +10,5 @@
     - [Seminar 6](./seminar_6.md)
     - [Seminar 7](./seminar_7.md)
 - [Laboator](./laborator.md)
+    - [Laboator 1](./laborator_1.md)
+    - [Laboator 2](./laborator_2.md)
