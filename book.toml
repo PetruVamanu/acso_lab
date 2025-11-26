@@ -5,3 +5,4 @@ src = "src"
 title = "Laborator ACSO"
 
 [preprocessor.katex]
+render-options = { displayMode = true }
