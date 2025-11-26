@@ -4,5 +4,7 @@ language = "ro"
 src = "src"
 title = "Laborator ACSO"
 
+[output.html]
+
 [preprocessor.katex]
 render-options = { displayMode = true }
