@@ -12,3 +12,4 @@
 - [Laboator](./laborator.md)
     - [Laboator 1](./laborator_1.md)
     - [Laboator 2](./laborator_2.md)
+    - [Laboator 3](./laborator_3.md)
