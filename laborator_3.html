@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Seminar 5 - Laborator ACSO</title>
+        <title>Laboator 3 - Laborator ACSO</title>
 
 
         <!-- Custom HTML head -->
@@ -184,55 +184,394 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="seminar-5"><a class="header" href="#seminar-5">Seminar 5</a></h1>
+                        <h1 id="laboator-3"><a class="header" href="#laboator-3">Laboator 3</a></h1>
+<h2 id="instructiuni-de-salt"><a class="header" href="#instructiuni-de-salt">Instructiuni de salt</a></h2>
+<p>Instrucţiunile de salt modifică valoarea registrului contor program (EIP), astfel încât următoarea instrucţiune care se execută să nu fie neapărat cea care urmează în memorie. Sunt utile pentru implementarea, la nivel de limbaj de asamblare, a structurilor de control (testări sau bucle).</p>
+<p>Salturile pot fi:</p>
+<ul>
+<li>neconditionate (prin instructiunea <code>jmp</code>)</li>
+<li>conditionate (instructiuni de forma <code>j&lt;conditie&gt;</code>)</li>
+</ul>
+<p>Pentru orice instrucțiune de salt trebuie indicată adresa la care se va face saltul</p>
+<p>Exprimarea adresei se poate face prin urmatoarele moduri:</p>
+<ul>
+<li>valoare constanta</li>
+<li>continutul unui registru</li>
+<li>continutul unei locatii din memorie</li>
+</ul>
+<p>În practică, adresa de salt este aproape întotdeauna o valoare constantă</p>
+<ul>
+<li>dar de unde știm care este adresa dorită?</li>
+</ul>
+<p>Raspuns: precizarea adreselor - prin etichete</p>
+<ul>
+<li>similar limbajului C (instrucțiunea <code>goto</code>)</li>
+<li>se pot face salturi din blocuri de cod <code>_asm</code> în blocuri de cod C și invers</li>
+</ul>
+<h2 id="salt-neconditionat"><a class="header" href="#salt-neconditionat">Salt neconditionat</a></h2>
+<h3 id="sintaxa"><a class="header" href="#sintaxa">Sintaxa</a></h3>
+<p><code>jmp adresa</code></p>
+<ul>
+<li>nu necesita informaii suplimentare</li>
+<li>utilitate redusă - execuția programului nu este ramificată în două variante</li>
+</ul>
+<p>Exemplu:</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+
+void main()
+{
+  int i;
+  _asm {
+    mov i, 11
+    jmp eticheta
+    sub i, 3;     // aceasta instructiune nu se executa
+  eticheta:
+    add i, 4
+  }
+  printf ("%d\n", i);
+}
+</code></pre>
+<p>Este util, folosit împreună cu salturi condiţionate, pentru reluarea unei secvenţe de de cod într-o buclă, aşa cum se va vedea într-un exemplu ulterior.</p>
+<h2 id="salt-conditionat"><a class="header" href="#salt-conditionat">Salt conditionat</a></h2>
+<p>Introduc o ramificaţie în program, deoarece avem două variante:</p>
+<ul>
+<li>condiţia de salt este adevărată – se face saltul la adresa indicată</li>
+<li>condiţia de salt este falsă – se continuă cu instrucţiunea următoare din memorie ca şi cum nu ar fi existat instrucţiune de salt.</li>
+</ul>
+<h3 id="salturi-pentru-indicatori-individuali"><a class="header" href="#salturi-pentru-indicatori-individuali">Salturi pentru indicatori individuali</a></h3>
+<p>Cele mai utile la acest nivel sunt cele care testează indicatorii:</p>
+<ul>
+<li>Carry</li>
+<li>Overflow</li>
+<li>Sign</li>
+<li>Zero</li>
+</ul>
+<p>Pentru fiecare indicator există două instrucţiuni de salt condiţionat:</p>
+<ul>
+<li>una care face saltul când indicatorul testat are valoarea 1</li>
+<li>una care face saltul când are valoarea 0</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">indicator testat</th><th style="text-align: left">salt pt. valoarea 1</th><th style="text-align: left">salt pt. valoarea 0</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left">Carry</td><td style="text-align: left"><code>jc</code> (Jump if Carry)</td><td style="text-align: left"><code>jnc</code> (Jump if Not Carry)</td></tr>
+<tr><td style="text-align: left">Overflow</td><td style="text-align: left"><code>jo</code> (Jump if Overflow)</td><td style="text-align: left"><code>jno</code> (Jump if Not Overflow)</td></tr>
+<tr><td style="text-align: left">Zero</td><td style="text-align: left"><code>jz</code> (Jump if Zero)</td><td style="text-align: left"><code>jnz</code> (Jump if Not Zero)</td></tr>
+<tr><td style="text-align: left">Sign</td><td style="text-align: left"><code>js</code> (Jump if Sign)</td><td style="text-align: left"><code>jns</code> (Jump if Not Sign)</td></tr>
+<tr><td style="text-align: left">Parity</td><td style="text-align: left"><code>jp</code> (Jump if Parity)</td><td style="text-align: left"><code>jnp</code> (Jump if Not Parity)</td></tr>
+</tbody>
+</table>
+</div>
+<p>Exemplu</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+
+void main()
+{
+  int a, b, s=0;
+  printf("a=");
+  scanf("%x", &amp;a);
+  printf("b=");
+  scanf("%x", &amp;b);
+  
+  _asm {
+    mov eax, a;
+    add eax, b;
+    jc semnaleaza_depasire; //in Visual C++,
+                            //putem sari la o eticheta din codul C
+    mov s, eax;
+    jmp afiseaza_suma;      //sau in alt bloc asm
+  }
+semnaleaza_depasire: 
+  printf ("S-a produs depasire!\n");
+  return;
+  _asm {
+    afiseaza_suma:
+  }
+  printf ("%x + %x = %x\n", a, b, s);
+}
+</code></pre>
+<p>Chiar daca poate fi folosit uneori, nu este suficient pentru a face teste pe baza operatorilor cu care sunt testati relatiile in limbajul C: &lt;, &lt;=, ==, !=, &gt;, &gt;=.</p>
+<h3 id="comparare"><a class="header" href="#comparare">Comparare</a></h3>
+<p>A fost introdusa pentru a rezolva “lipsul” salturilor pentru indicatori individuali</p>
+<h4 id="sintaxa-1"><a class="header" href="#sintaxa-1">Sintaxa</a></h4>
+<p><code>cmp op1, op2</code></p>
+<p>Intern, se realizeaza o scadere pentru care rezultatul nu se scrie/pastreaza nicaieri. In schimb sunt setati indicatorii de conditii.</p>
+<p>Instrucțiunea trebuie urmată de un salt care testează o anumită relație între op1 și op2</p>
+<h3 id="salturi-care-testeaza-relatii"><a class="header" href="#salturi-care-testeaza-relatii">Salturi care testeaza relatii</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">relație</th><th style="text-align: left">operanzi fără semn</th><th style="text-align: left">operanzi cu semn</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left"><code>op1 &lt; op2</code></td><td style="text-align: left"><code>jb</code> (Jump if Below)</td><td style="text-align: left"><code>jl</code> (Jump if Less)</td></tr>
+<tr><td style="text-align: left"><code>op1 &lt;= op2</code></td><td style="text-align: left"><code>jbe</code> (Jump if Below or Equal)</td><td style="text-align: left"><code>jle</code> (Jump if Less or Equal)</td></tr>
+<tr><td style="text-align: left"><code>op1 &gt; op2</code></td><td style="text-align: left"><code>ja</code> (Jump if Above)</td><td style="text-align: left"><code>jg</code> (Jump if Greater)</td></tr>
+<tr><td style="text-align: left"><code>op1 &gt;= op2</code></td><td style="text-align: left"><code>jae</code> (Jump if Above or Equal)</td><td style="text-align: left"><code>jge</code> (Jump if Greater or Equal)</td></tr>
+<tr><td style="text-align: left"><code>op1 == op2</code></td><td style="text-align: left"><code>je</code> (Jump if Equal)</td><td style="text-align: left"><code>je</code> (Jump if Equal)</td></tr>
+<tr><td style="text-align: left"><code>op1 != op2</code></td><td style="text-align: left"><code>jne</code> (Jump if Not Equal)</td><td style="text-align: left"><code>jne</code> (Jump if Not Equal)</td></tr>
+</tbody>
+</table>
+</div>
+<p>Sunt necesare instrucţiuni diferite pentru numere fără semn, respectiv cu semn, deoarece indicatorii ce trebuie verificaţi diferă. De exemplu, comparând 00100110 şi 11001101, ar trebui să obţinem relaţia 00100110 &lt; 11001101 dacă sunt numere fără semn, şi 00100110 &gt; 11001101 dacă sunt numere cu semn.</p>
+<h2 id="structuri-de-control"><a class="header" href="#structuri-de-control">Structuri de control</a></h2>
+<ul>
+<li>în limbajul C nu se recomandă utilizarea instrucțiunii <code>goto</code></li>
+<li>în schimb, se folosesc structuri de control</li>
+<li>dar implementarea acestora la nivelul procesorului se face tot prin instrucțiuni de salt</li>
+</ul>
+<h3 id="structura-if"><a class="header" href="#structura-if">Structura If</a></h3>
+<h4 id="implementare---salt-condiționat-pe-condiție-inversă-celei-din-limbajul-c"><a class="header" href="#implementare---salt-condiționat-pe-condiție-inversă-celei-din-limbajul-c">Implementare - salt condiționat pe condiție inversă celei din limbajul C</a></h4>
+<ul>
+<li>motivație</li>
+<li>în limbajul C, se execută o secvență de cod dacă o condiție este adevărată</li>
+<li>în limbajul de asamblare, instrucțiunile de salt pot evita execuția unei secvențe de cod</li>
+</ul>
+<pre><code class="language-c++">/// C
+    int a,x;
+    // tip cu semn
+    ...
+    if(x&gt;5)
+        a=2;
+
+/// ASM
+    cmp x,5
+    jle maimare
+    mov a,2
+    maimare:
+</code></pre>
+<h4 id="ramura-else"><a class="header" href="#ramura-else">Ramura else</a></h4>
+<p>dacă avem şi o ramură else, trebuie
+utilizate două instrucţiuni de salt</p>
+<ul>
+<li>a doua instrucţiune se asigură că, la
+terminarea execuţiei instrucţiunilor din
+prima ramură, nu vor fi executate şi
+instrucţiunile din a doua ramură</li>
+<li>salt necondiționat</li>
+</ul>
+<pre><code class="language-c++">/// C
+    if(x&gt;5)
+        x--;
+    else
+        x++;
+/// ASM
+    cmp x,5
+    jle nu
+    dec x
+    jmp afara
+nu:
+    inc x
+afara:
+</code></pre>
+<h3 id="structura-switch"><a class="header" href="#structura-switch">Structura Switch</a></h3>
+<p>similară unei structuri if-else</p>
+<ul>
+<li>organizare</li>
+<li>se compară valoarea testată, pe rând, cu toate
+constantele corespunzătoare cazurilor din
+blocul switch</li>
+<li>pentru fiecare caz se face un salt condiționat la
+codul aferent</li>
+</ul>
+<pre><code class="language-c++">/// C
+    switch (i) {
+        case 0:
+            a = 5; break;
+        case 1:
+            a = 7; //break - omis intenționat
+        default:
+            a = 10; 
+    }
+/// ASM
+    cmp i,0
+    je case_0
+    cmp i,1
+    je case_1
+    jmp case_default
+
+case_0:
+    mov a,5
+    jmp case_final
+
+case_1:
+    mov a,7
+    //aici nu este break
+
+case_default:
+    mov a,10
+    case_final:
+</code></pre>
+<h3 id="structura-while"><a class="header" href="#structura-while">Structura While</a></h3>
+<ul>
+<li>două instrucţiuni de salt
+<ul>
+<li>prima pentru a decide dacă se execută o nouă
+iteraţie sau se părăseşte bucla
+<ul>
+<li>saltul - pe condiţia inversă celei din codul C</li>
+</ul>
+</li>
+<li>a doua pentru a relua execuția de la început
+<ul>
+<li>la finalul corpului buclei</li>
+<li>salt necondiţionat</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-c++">/// C
+    while(x&lt;10)
+        x++;
+/// ASM
+bucla:
+    cmp x,5
+    jge afara
+    inc x
+    jmp bucla
+afara:
+</code></pre>
+<h3 id="structura-do-while"><a class="header" href="#structura-do-while">Structura Do While</a></h3>
+<ul>
+<li>testul de continuare/ieşire - la final</li>
+<li>se testează aceeaşi condiţie ca în limbajul C</li>
+<li>în ambele limbaje, condiția adevărată duce la
+reluarea buclei</li>
+</ul>
+<pre><code class="language-c++">/// C
+    do {
+        s+=i;
+        i++;
+    } while(i&lt;=5);
+
+/// ASM
+bucla:
+    mov eax,s
+    add eax,i
+    mov s,eax
+    inc i
+    cmp i,5
+    jle bucla
+
+</code></pre>
+<h3 id="structura-for"><a class="header" href="#structura-for">Structura For</a></h3>
+<ul>
+<li>similară structurii While</li>
+<li>instrucţiuni auxiliare - delimitează clar
+<ul>
+<li>iniţializarea variabilelor</li>
+<li>actualizarea valorilor variabilelor pentru iteraţia următoare</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-c++">/// C
+    for(i=0;i&lt;=5;i++)
+        s+=3;
+
+/// ASM
+    mov i,0
+    bucla: 
+        cmp i,5
+        jg afara
+        add s,3
+        inc i
+        jmp bucla
+    afara:
+</code></pre>
+<hr>
 <h2 id="exercitii"><a class="header" href="#exercitii">Exercitii</a></h2>
-<h3 id="1transformati-numarul-n-din-baza-x-in-baza-y"><a class="header" href="#1transformati-numarul-n-din-baza-x-in-baza-y">1.Transformati numarul n, din baza x in baza y:</a></h3>
+<h3 id="1-verificarea-semnului"><a class="header" href="#1-verificarea-semnului">1. Verificarea semnului</a></h3>
+<p>Scrieti un program C care citeste un numar intreg <code>x</code> de la tastatura. Folosind un bloc <code>_asm</code>, verificati daca numarul este negativ sau pozitiv/zero.</p>
 <ul>
-<li>a) n = 34.45, x = 10, y = 2</li>
-<li>b) n = 1000111.110011, x = 2, y = 10</li>
-<li>c) n = 1000111.110011, x = 2, y = 16</li>
-<li>d) n = 34.45, x = 10, y = 16</li>
+<li>Daca <code>x &lt; 0</code>, variabila <code>rezultat</code> va lua valoarea -1.</li>
+<li>Daca <code>x &gt;= 0</code>, variabila <code>rezultat</code> va lua valoarea 1.
+Afisati rezultatul.</li>
 </ul>
-<h3 id="2-exercitii-bcd-si-excess-n"><a class="header" href="#2-exercitii-bcd-si-excess-n">2. Exercitii BCD si Excess-n</a></h3>
+<hr>
+<h3 id="2-maximul-a-doua-numere"><a class="header" href="#2-maximul-a-doua-numere">2. Maximul a doua numere</a></h3>
+<p>Se dau doua variabile <code>a</code> si <code>b</code>. Implementati in limbaj de asamblare logica pentru a pune in variabila <code>max_val</code> valoarea cea mai mare dintre cele doua.</p>
+<hr>
+<h3 id="3-functie-matematica-pe-ramuri"><a class="header" href="#3-functie-matematica-pe-ramuri">3. Functie matematica pe ramuri</a></h3>
+<p>Implementati urmatoarea functie definita pe ramuri, pentru un <code>x</code> citit de la tastatura:</p>
 <ul>
-<li>a) 456(10) → (BCD)</li>
-<li>b) 12345(10) → (BCD)</li>
-<li>c) Care este intervalul reprezentat in Excess-23 (4 sau 5 biti)?</li>
-<li>d) Care este intervalul reprezentat in Excess-13 (4 sau 5 biti)?</li>
+<li>Daca <code>x</code> este par, <code>y = x + 5</code></li>
+<li>Daca <code>x</code> este impar, <code>y = x - 1</code></li>
 </ul>
-<h3 id="3-reprezentari-as"><a class="header" href="#3-reprezentari-as">3. Reprezentari A+S</a></h3>
+<hr>
+<h3 id="4-incadrare-in-interval"><a class="header" href="#4-incadrare-in-interval">4. Incadrare in interval</a></h3>
+<p>Se da un numar <code>x</code>. Verificati daca <code>x</code> apartine intervalului <code>[10, 20]</code>.</p>
 <ul>
-<li>a) 123.456 = $val_{A+S}^{8,8}$ (?)</li>
-<li>b) 75.45 = $val_{A+S}^{3,5}$ (?)</li>
-<li>c) 10110.111 + 00010.001 in ${A + S}_{(5,3)}$</li>
-<li>d) 10011.010 + 11101.111 in ${A + S}_{(5,3)}$</li>
+<li>Daca da, variabila <code>valid</code> devine 1.</li>
+<li>Altfel, variabila <code>valid</code> devine 0.</li>
 </ul>
-<h3 id="4-reprezentari-c_1"><a class="header" href="#4-reprezentari-c_1">4. Reprezentari $C_1$:</a></h3>
+<hr>
+<h3 id="5-mini-calculator"><a class="header" href="#5-mini-calculator">5. Mini-calculator</a></h3>
+<p>Se citesc doua numere <code>a</code> si <code>b</code> si un cod de operatie <code>op</code> (intreg).</p>
 <ul>
-<li>a) −123.75 = $val_{C_1}^{8,3}$ (?)</li>
-<li>b) −75.0625 = $val_{C_1}^{8,4}$(?)</li>
-<li>c) 10110.111 + 00010.001 in $C_1^{(5,3)}$</li>
-<li>d) 10011.010 + 11101.111 in $C_1^{(5,3)}$</li>
+<li>Daca <code>op == 1</code>, calculati <code>res = a + b</code></li>
+<li>Daca <code>op == 2</code>, calculati <code>res = a - b</code></li>
+<li>Daca <code>op == 3</code>, calculati <code>res = a * b</code> (presupuneti ca incape in 32 biti)</li>
+<li>Pentru orice alt cod, <code>res = 0</code>
+Implementati folosind comparatii succesive (simulare switch).</li>
 </ul>
-<h3 id="5-reprezentari-c_2"><a class="header" href="#5-reprezentari-c_2">5. Reprezentari $C_2$:</a></h3>
+<hr>
+<h3 id="6-suma-numerelor"><a class="header" href="#6-suma-numerelor">6. Suma numerelor</a></h3>
+<p>Calculati suma primelor <code>n</code> numere naturale (1 + 2 + … + n), unde <code>n</code> este citit de la tastatura.
+Folositi registrul <code>ecx</code> pe post de contor si o structura de tip bucla.</p>
+<hr>
+<h3 id="7-numararea-bitilor-de-1"><a class="header" href="#7-numararea-bitilor-de-1">7. Numararea bitilor de 1</a></h3>
+<p>Se da un numar intreg <code>n</code>. Numarati cati biti de 1 are acest numar in reprezentarea sa binara si salvati rezultatul in variabila <code>k</code>.</p>
+<hr>
+<h3 id="8-impartirea-prin-scaderi-repetate"><a class="header" href="#8-impartirea-prin-scaderi-repetate">8. Impartirea prin scaderi repetate</a></h3>
+<p>Implementati impartirea intreaga a lui <code>deimpartit</code> la <code>impartitor</code> folosind doar scaderi (fara instructiunea <code>div</code> sau <code>idiv</code>).</p>
 <ul>
-<li>a) −123.75 = $val_{C_2}^{8,3}$ (?)</li>
-<li>b) −75.0625 = $val_{C_2}^{8,4}$(?)</li>
-<li>c) 10110.111 + 00010.001 in $C_2^{(5,3)}$</li>
-<li>d) 10011.010 + 11101.111 in $C_2^{(5,3)}$</li>
+<li>Scadeti <code>impartitor</code> din <code>deimpartit</code> atata timp cat <code>deimpartit &gt;= impartitor</code>.</li>
+<li>Numarati de cate ori ati scazut (acesta va fi catul).</li>
+<li>Ce ramane in <code>deimpartit</code> la final este restul.
+Folositi o structura de tip <code>do-while</code> (verificarea la final) sau <code>while</code>.</li>
 </ul>
+<hr>
+<h3 id="9-sirul-lui-fibonacci"><a class="header" href="#9-sirul-lui-fibonacci">9. Sirul lui Fibonacci</a></h3>
+<p>Generati al <code>n</code>-lea termen din sirul lui Fibonacci, unde <code>n</code> este dat.
+Sirul: 0, 1, 1, 2, 3, 5, 8, 13…</p>
+<ul>
+<li>F0 = 0, F1 = 1</li>
+<li>Fn = F(n-1) + F(n-2)</li>
+</ul>
+<hr>
+<h3 id="10-verificare-numar-prim"><a class="header" href="#10-verificare-numar-prim">10. Verificare numar prim</a></h3>
+<p>Verificati daca un numar <code>n</code> (n &gt; 2) este prim.</p>
+<ul>
+<li>Creati o bucla cu un divizor <code>d</code> care porneste de la 2 si merge pana la <code>n/2</code> (sau <code>n-1</code>).</li>
+<li>In interiorul buclei, calculati restul impartirii lui <code>n</code> la <code>d</code> (folosind <code>div</code> sau <code>idiv</code>).</li>
+<li>Daca restul este 0, numarul nu este prim: setati un flag si folositi un salt (<code>break</code>) pentru a iesi fortat din bucla.</li>
+<li>Daca bucla se termina fara sa gasiti divizori, numarul este prim.</li>
+</ul>
+<hr>
+<h3 id="11-cel-mai-mare-divizor-comun"><a class="header" href="#11-cel-mai-mare-divizor-comun">11. Cel mai mare divizor comun</a></h3>
+<p>Implementati algoritmul lui Euclid prin scaderi repetate pentru a gasi CMMDC al numerelor <code>a</code> si <code>b</code>.
+Algoritm:</p>
+<pre><code class="language-text">Cat timp (a != b) executa:
+    Daca a &gt; b atunci
+        a = a - b
+    Altfel
+        b = b - a
+Sfarsit Cat timp
+Resultat = a
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="seminar_4.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="laborator_2.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="seminar_6.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -240,13 +579,10 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="seminar_4.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="laborator_2.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="seminar_6.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
-                    </a>
             </nav>
 
         </div>
