@@ -46,10 +46,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-d18e6e95.js";
+            window.path_to_searchindex_js = "searchindex-3f6c8c00.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-28d565ec.js"></script>
+        <script src="toc-d923e4bf.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -1310,6 +1310,357 @@ Algoritm:</p>
 Sfarsit Cat timp
 Resultat = a
 </code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="laboator-4"><a class="header" href="#laboator-4">Laboator 4</a></h1>
+<h2 id="lucrul-cu-stiva"><a class="header" href="#lucrul-cu-stiva">Lucrul cu stiva</a></h2>
+<p>Procesorul foloseşte o parte din memoria RAM pentru a o accesa printr-o disciplină de tip LIFO</p>
+<ul>
+<li>gestiune - adresa vârfului stivei</li>
+<li>memorată în registrul <code>ESP</code></li>
+<li>structurile de tip stivă sunt necesare în
+multe situaţii</li>
+</ul>
+<p>Instrucţiunile care permit lucrul cu stiva sunt <code>push</code> şi <code>pop</code>.</p>
+<h3 id="instructiunea-push"><a class="header" href="#instructiunea-push">Instructiunea PUSH</a></h3>
+<p>Realizează introducerea unei valori în stivă.</p>
+<p>Sintaxa: <code>push operand;</code></p>
+<p>Operandul poate fi registru, locaţie de memorie sau constantă numerică. Stiva lucrează doar cu valori de 2 sau 4 octeţi, pentru uniformitate preferându-se numai operanzi de 4 octeţi (varianta cu 2 se păstrază pentru compatibilitate cu procesoarele mai vechi).</p>
+<p>Introducerea valorii în stivă se face astfel: se scade din <code>ESP</code> dimensiunea, în octeţi, a valorii care se vrea depusa în stivă, dupa care procesorul scrie valoarea operandului la adresa indicată de registrul <code>ESP</code> (vârful stivei); dimensiunea poate fi 2 sau 4 (se observă că se avansează “în jos”, de la adresele mai mari la adresele mai mici); în acest mod, vârful stivei este pregătit pentru următoarea operaţie de scriere.</p>
+<p>Exemple:</p>
+<pre><code>push eax
+push dx
+push dword ptr [200]
+push word ptr [esi*2+ecx]
+push dword ptr 5
+push word ptr 14
+</code></pre>
+<p>De exemplu, instrucţiunea</p>
+<pre><code>push eax;
+</code></pre>
+<p>ar fi echivalentă cu:</p>
+<pre><code>sub esp, 4;
+mov [esp], eax;
+</code></pre>
+<p>Prin folosirea lui push în locul secvenţei echivalente se reduce, însă, riscul erorilor.</p>
+<h3 id="instructiunea-pop"><a class="header" href="#instructiunea-pop">Instructiunea POP</a></h3>
+<p>Extrage vârful stivei într-un operand destinaţie.</p>
+<p>Sintaxa: <code>pop operand</code>;</p>
+<p>Operandul poate fi registru sau locaţie de memorie, de 2 sau 4 octeţi.</p>
+<p>Exemple:</p>
+<pre><code>pop eax
+pop cx
+pop dword ptr [ebx+edi]
+pop word ptr [edx+100]
+</code></pre>
+<p>Extragerea valorii din stivă se face prin depunerea în destinaţie a valorii aflate în vârful stivei (la adresa <code>[ESP]</code>) şi adunarea, la <code>ESP</code>, a numărului de octeţi ai operandului (acesta indică, practic, numărul de octeţi scoşi din stivă).</p>
+<h3 id="rolul-stivei"><a class="header" href="#rolul-stivei">Rolul stivei</a></h3>
+<p>Rolul stivei programului - stocarea de informaţii cu caracter temporar</p>
+<ul>
+<li>salvarea pentru un timp a valorii unui registru, pentru a-l folosi în alt scop
+<ul>
+<li>apoi valoarea salvată este restaurată în registru</li>
+</ul>
+</li>
+<li>variabile locale
+<ul>
+<li>create la momentul apelului funcţiei și distruse la terminarea execuției funcţiei</li>
+</ul>
+</li>
+</ul>
+<h4 id="de-retinut"><a class="header" href="#de-retinut">De retinut!</a></h4>
+<p>Instrucţiunile de introducere în stivă trebuie riguros compensate de cele de scoatere din stivă</p>
+<ul>
+<li>ca număr de instrucţiuni</li>
+<li>ca dimensiune a operanzilor
+Orice eroare afectează mai multe date decât pare la prima vedere</li>
+</ul>
+<p>Exemplu:</p>
+<pre><code>push eax
+push edx
+mov eax,[esi]
+mov edx,5
+mul edx
+mov [esi],eax
+
+pop eax
+</code></pre>
+<p>O instrucţiune <code>pop</code> a fost uitată - efecte</p>
+<ul>
+<li>registrul <code>eax</code> primeşte altă valoare decât avea iniţial</li>
+<li>valoarea iniţială a registrului <code>edx</code> nu este restaurată</li>
+</ul>
+<p>Similar dacă se execută prea multe instrucţiuni <code>pop</code></p>
+<p>Exemplu 2:</p>
+<pre><code>push edx;
+push eax;
+... //utilizare registri
+pop  ax  //se recupereaza doar 2 octeti din valoarea anterioara a lui eax
+pop edx  //nu se recupereaza edx, ci 2 octeti din eax, 2 din edx
+         //decalajul se poate propaga astfel pana la capatul stivei
+</code></pre>
+<p>O altă eroare poate apărea atunci când registrul ESP este manipulat direct. De exemplu, pentru a aloca spaţiu unei variabile locale (neiniţializată), e suficient a scădea din ESP dimensiunea variabilei respective. Similar, la distrugerea variabilei, valoarea ESP este crescută. Aici nu se folosesc în general instrucţiuni push, repectiv pop, deoarece nu interesează valorile implicate, ci doar ocuparea şi eliberarea de spaţiu. Se preferă adunarea şi scăderea direct cu registrul ESP; evident că o eroare în aceste operaţii are consecinţe de aceeaşi natură ca şi cele de mai sus.</p>
+<h2 id="apeluri-de-functii"><a class="header" href="#apeluri-de-functii">Apeluri de functii</a></h2>
+<p>La prima vedere - ca o instrucţiune de salt</p>
+<ul>
+<li>se întrerupe execuţia liniară a programului şi se sare la altă adresă</li>
+</ul>
+<p>Diferență - la terminarea funcţiei se revine la adresa de unde s-a făcut apelul</p>
+<ul>
+<li>deci aceasta a fost memorată</li>
+<li>informaţie temporară - tot pe stivă</li>
+</ul>
+<p>Din moment ce într-un program se poate apela o funcţie de mai multe ori, din mai multe locuri, şi întotdeauna se revine unde trebuie, este clar că adresa la care trebuie revenit este memorată şi folosită atunci când este cazul. Cum adresa de revenire este în mod evident o informaţie temporară, locul său este tot pe stivă.</p>
+<h3 id="instructiunea-call"><a class="header" href="#instructiunea-call">Instructiunea CALL</a></h3>
+<p>Sintaxa <code>call adresa</code></p>
+<ul>
+<li>în Visual C++, adresa este indicată folosind chiar numele funcţiei apelatea</li>
+</ul>
+<p>Efectul instrucţiunii call: se introduce în stivă adresa instrucţiunii următoare (adresa de revenire) şi se face salt la adresa indicată. Aceste acţiuni puteau fi realizate şi cu instrucţiuni push şi jmp, dar din nou se preferă call pentru evitarea erorilor.</p>
+<h3 id="instructiunea-ret"><a class="header" href="#instructiunea-ret">Instructiunea RET</a></h3>
+<p>Sintaxa <code>ret</code></p>
+<p>Revenirea dintr-o funcţie se face prin instrucţiunea ret, care poate fi folosită fără operand. În acest caz, se preia adresa de revenire din vârful stivei (similar unei instrucţiuni pop) şi se face saltul la adresa respectivă. Din motive de conlucrare cu Visual Studio, nu vom folosi această instrucţiune.</p>
+<h4 id="erori-în-lucrul-cu-stiva"><a class="header" href="#erori-în-lucrul-cu-stiva">Erori în lucrul cu stiva</a></h4>
+<ul>
+<li>o instrucţiune pop omisă (sau una în plus)
+<ul>
+<li>la execuţia unei instrucţiuni ret se va prelua din stivă altă valoare decât adresa corectă de revenire</li>
+<li>efect - blocarea programului sau terminarea sa
+forţată</li>
+</ul>
+</li>
+</ul>
+<h3 id="variabile-locale"><a class="header" href="#variabile-locale">Variabile locale</a></h3>
+<ul>
+<li>create de obicei la începutul execuției
+funcției/blocului</li>
+<li>fiind temporare, sunt plasate tot pe stivă</li>
+<li>ocuparea spațiului pe stivă se poate face
+<ul>
+<li>prin instrucțiuni push</li>
+<li>prin scăderea valorii vârfului stivei (ESP)</li>
+</ul>
+</li>
+<li>la terminarea funcției/blocului, trebuie
+eliminate de pe stivă</li>
+</ul>
+<p>Cod C</p>
+<pre><code>int a,b=3,c;
+</code></pre>
+<p>Cod ASM</p>
+<pre><code>sub esp,12 //alocare spațiu
+mov dword ptr [esp+4],3 // b  3
+
+...
+add esp,12 //eliberare spațiu la final
+</code></pre>
+<h3 id="transmiterea-parametrilor"><a class="header" href="#transmiterea-parametrilor">Transmiterea parametrilor</a></h3>
+<ul>
+<li>sunt tot variabile locale - se găsesc pe stivă</li>
+<li>apelantul are responsabilitatea
+<ul>
+<li>de a-i pune pe stivă la apel</li>
+</ul>
+</li>
+<li>folosind instrucțiunea push
+<ul>
+<li>de a-i scoate de pe stivă la revenirea din funcţia
+apelată</li>
+</ul>
+</li>
+<li>nu se folosește instrucțiunea pop, ci se adună la
+ESP numărul total de octeţi ocupat de parametri</li>
+<li>în C/C++ parametrii trebuie puşi în stivă în ordine inversă celei în care se găsesc în lista de parametri
+<ul>
+<li>motiv - funcții cu număr variabil de parametri</li>
+</ul>
+</li>
+<li>de ce trebuie scoşi din stivă la revenire?
+<ul>
+<li>la finalul fiecărei unități de program trebuie să lăsăm stiva așa cum am găsit-o la intrare</li>
+<li>altfel apar erori de tipul celor descrise anterior</li>
+</ul>
+</li>
+</ul>
+<p>Exemplu:</p>
+<p>• cod C</p>
+<pre><code class="language-c++">void dif(int a,int b)
+{
+    int c;
+    c=a-b;
+    cout&lt;&lt;c&lt;&lt;endl;
+}
+</code></pre>
+<p>apelul dif(9,5) se traduce prin secvenţa
+de mai jos:</p>
+<pre><code>push dword ptr 5
+push dword ptr 9
+call dif
+add esp,8
+</code></pre>
+<h3 id="accesul-la-parametri"><a class="header" href="#accesul-la-parametri">Accesul la parametri</a></h3>
+<ul>
+<li>primul parametru din antetul funcţiei se găseşte
+întotdeauna la adresa EBP+8</li>
+<li>următorii parametri, mergând spre dreapta în
+lista parametrilor, sunt la adrese corespunzător
+mai mari: EBP+12, EBP+16 etc.</li>
+</ul>
+<p>Exemplu, o functie cu 3 parametri de tip int (o variabila de tip int are 4 octeti):</p>
+<pre><code class="language-c++">void functie(int a, int b, int c){
+  _asm{
+                
+      mov eax, [ebp+8]  // muta in eax valoarea lui a
+      mov ebx, [ebp+12] // muta in ebx valoarea lui b
+      mov ecx, [ebp+16] // muta in ecx valoarea lui c
+
+  };
+}
+</code></pre>
+<p>Scris in aceasta maniera, exemplul de mai sus ar arata in felul urmator:</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+
+int compute_dif(int ,int ) { // nu mai este nevoie sa punem nume variabilelor, deoarece vom lucra direct cu stiva
+  _asm{
+                
+    mov eax, [ebp+8]; 
+    sub eax, [ebp+12]; 
+                // in eax ramane rezultatul, care 
+                // va fi preluat la termiarea functiei
+  };
+}
+
+void main() {
+  int c;
+  _asm {
+    push dword ptr 9
+    push dword ptr 5
+    call compute_dif  // se salveaza adresa de revenire pe stiva
+    mov c, eax;
+    add esp,8         // "stergerea" parametrilor din stiva
+  }
+  printf("Diferenta este %d.\n", c);
+}
+</code></pre>
+<h3 id="returnarea-valorilor"><a class="header" href="#returnarea-valorilor">Returnarea valorilor</a></h3>
+<ul>
+<li>convenție stabilită de compilator</li>
+<li>Visual C++ - rezultatul se depune într-un
+registru - depinde de dimensiunea sa
+<ul>
+<li>tipuri de date de dimensiune 1 octet: al</li>
+<li>tipuri de date de dimensiune 2 octeţi: ax</li>
+<li>tipuri de date de dimensiune 4 octeţi: eax</li>
+<li>tipuri de date de dimensiune 8 octeţi: edx şi eax</li>
+</ul>
+</li>
+</ul>
+<h3 id="pastrarea-valorilor-registrilor"><a class="header" href="#pastrarea-valorilor-registrilor">Pastrarea valorilor registrilor</a></h3>
+<ul>
+<li>programul pe care îl scriem este C/C++</li>
+<li>nu ştim cum foloseşte compilatorul regiştrii</li>
+<li>pentru orice funcţie pe care o scriem în limbaj de asamblare
+<ul>
+<li>la începutul execuţiei funcţiei trebuie salvați în stivă regiștrii pe care îi folosim în funcție</li>
+</ul>
+</li>
+<li>la terminare, valorile lor trebuie restaurate</li>
+<li>excepție - eax şi edx (returnare valori)</li>
+</ul>
+<h3 id="functii-recursive"><a class="header" href="#functii-recursive">Functii recursive</a></h3>
+<ul>
+<li>
+<p>nu implică un mecanism diferit de funcțiile obișnuite (nerecursive)</p>
+</li>
+<li>
+<p>apelul se face către aceeași funcție, nu către alta</p>
+</li>
+<li>
+<p>în orice limbaj este scrisă, trebuie multă atenție la condiția de terminare a recursiei</p>
+<ul>
+<li>risc - recursie infinită</li>
+</ul>
+</li>
+<li>
+<p>la scrierea în limbaj de asamblare, programatorul trebuie să implementeze ambele părți ale protocolului de comunicare</p>
+<ul>
+<li>depunerea parametrilor în stivă - la efectuarea apelului</li>
+<li>preluarea parametrilor din stivă - la execuția funcției</li>
+</ul>
+</li>
+<li>
+<p>atenție la preluarea rezultatului returnat de
+apelul anterior</p>
+</li>
+</ul>
+<h3 id="apeluri-de-întreruperi"><a class="header" href="#apeluri-de-întreruperi">Apeluri de întreruperi</a></h3>
+<ul>
+<li>întreruperi software
+<ul>
+<li>instrucțiunea int</li>
+<li>similară instrucțiunii call, dar mai complexă</li>
+</ul>
+</li>
+<li>revenirea din rutina de tratare
+<ul>
+<li>instrucțiunea iret</li>
+<li>din nou, similară cu ret, dar mai complexă</li>
+</ul>
+</li>
+</ul>
+<h2 id="exercitii-9"><a class="header" href="#exercitii-9">Exercitii</a></h2>
+<h3 id="1-inversarea-a-3-valori-folosind-stiva"><a class="header" href="#1-inversarea-a-3-valori-folosind-stiva">1. Inversarea a 3 valori folosind stiva</a></h3>
+<p>Aveti 3 variabile in C: <code>a</code>, <code>b</code>, <code>c</code>.
+Scrieti un bloc <code>_asm</code> care interschimba valorile acestor variabile folosind <strong>doar</strong> instructiuni <code>push</code> si <code>pop</code>, fara a folosi registre suplimentare (gen <code>eax</code> sau <code>ebx</code>) pentru stocarea temporara.</p>
+<hr>
+<h3 id="2-evaluarea-unei-expresii-folosind-stiva"><a class="header" href="#2-evaluarea-unei-expresii-folosind-stiva">2. Evaluarea unei expresii folosind stiva</a></h3>
+<p>Calculati expresia <code>E = a - b + c</code> folosind stiva pentru a pastra rezultatele intermediare.</p>
+<hr>
+<h3 id="3-functia-suma-a-3-numere"><a class="header" href="#3-functia-suma-a-3-numere">3. Functia “Suma a 3 numere”</a></h3>
+<p>Implementati o functie <code>int suma(int a, int b, int c)</code> complet in asamblare (corpul functiei) si apelati-o din <code>main</code> tot folosind asamblare.</p>
+<hr>
+<h3 id="4-functia-minimul-dintre-2-numere"><a class="header" href="#4-functia-minimul-dintre-2-numere">4. Functia “Minimul dintre 2 numere”</a></h3>
+<p>Scrieti o functie care primeste doi parametri intregi si returneaza cel mai mic dintre ei.</p>
+<hr>
+<h3 id="5-modificarea-unei-variabile-prin-pointer"><a class="header" href="#5-modificarea-unei-variabile-prin-pointer">5. Modificarea unei variabile prin pointer</a></h3>
+<p>Scrieti o functie <code>void dubleaza(int* p)</code> care primeste ca parametru adresa unei variabile si ii dubleaza valoarea.</p>
+<ul>
+<li>Atentie: Parametrul de pe stiva <code>[ebp+8]</code> nu este valoarea, ci <strong>adresa</strong> valorii.</li>
+<li>Trebuie sa incarcati adresa intr-un registru (ex: <code>mov ebx, [ebp+8]</code>), apoi sa operati asupra memoriei la care arata acel registru (ex: <code>add [ebx], ...</code>).</li>
+</ul>
+<hr>
+<h3 id="6-alocare-manuala-pe-stiva-variabile-locale"><a class="header" href="#6-alocare-manuala-pe-stiva-variabile-locale">6. Alocare manuala pe stiva (Variabile locale)</a></h3>
+<p>In cadrul unei functii <code>asm_func</code>, alocati spatiu pe stiva pentru 2 variabile locale de tip int (scazand <code>esp</code>).</p>
+<ul>
+<li>Initializati aceste variabile locale cu valorile 10 si 20.</li>
+<li>Adunati-le in <code>eax</code>.</li>
+<li>La final, eliberati spatiul alocat (adunand la <code>esp</code>) inainte de a returna.</li>
+</ul>
+<hr>
+<h3 id="7-factorialul-unui-numar-recursiv"><a class="header" href="#7-factorialul-unui-numar-recursiv">7. Factorialul unui numar (Recursiv)</a></h3>
+<p>Implementati functia recursiva <code>int factorial(int n)</code>.
+Algoritm:</p>
+<ul>
+<li>Verificati conditia de oprire: daca <code>n &lt;= 1</code>, returnati 1 (<code>mov eax, 1</code> si iesire).</li>
+<li>Pasul recursiv:
+<ul>
+<li>Calculati <code>n-1</code>.</li>
+<li>Puneti <code>n-1</code> pe stiva (<code>push</code>).</li>
+<li>Apelati <code>factorial</code>.</li>
+<li>Curatati stiva (<code>add esp, 4</code>).</li>
+<li>Rezultatul <code>factorial(n-1)</code> este acum in <code>eax</code>.</li>
+<li>Inmultiti <code>eax</code> cu <code>n</code> (care se afla la <code>[ebp+8]</code>).</li>
+<li>Returnati.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="8-salvarea-registrilor-callee-saved"><a class="header" href="#8-salvarea-registrilor-callee-saved">8. Salvarea Registrilor (Callee-Saved)</a></h3>
+<p>Scrieti o functie complexa care are nevoie de registrele <code>ebx</code>, <code>esi</code> si <code>edi</code> pentru calcule intermediare.</p>
+<ul>
+<li>Conform conventiei, aceste registre trebuie sa aiba aceeasi valoare la iesirea din functie ca la intrare.</li>
+<li><strong>La inceputul functiei:</strong> Salvati registrele pe stiva (<code>push ebx</code>, <code>push esi</code>, etc.).</li>
+<li><strong>La finalul functiei:</strong> Restaurati-le (<code>pop ...</code>) in ordine inversa.</li>
+</ul>
 
                     </main>
 
