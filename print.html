@@ -46,10 +46,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-3f6c8c00.js";
+            window.path_to_searchindex_js = "searchindex-51b6922f.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-d923e4bf.js"></script>
+        <script src="toc-891d1d10.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -1661,6 +1661,292 @@ Algoritm:</p>
 <li><strong>La inceputul functiei:</strong> Salvati registrele pe stiva (<code>push ebx</code>, <code>push esi</code>, etc.).</li>
 <li><strong>La finalul functiei:</strong> Restaurati-le (<code>pop ...</code>) in ordine inversa.</li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="laboator-5"><a class="header" href="#laboator-5">Laboator 5</a></h1>
+<h2 id="tablouri"><a class="header" href="#tablouri">Tablouri</a></h2>
+<p>Adresa unui element al unui tablou este formată din</p>
+<ul>
+<li>adresa de început a tabloului</li>
+<li>deplasamentul elementului în cadrul tabloului</li>
+</ul>
+<p>Exprimarea acestora:</p>
+<ul>
+<li>adresa de început a tabloului
+<ul>
+<li>prin numele variabilei tablou</li>
+</ul>
+</li>
+<li>deplasamentul elementului în cadrul tabloului
+<ul>
+<li>constantă</li>
+<li>registru</li>
+<li>eventual combinații</li>
+<li>nu o altă variablă din memorie</li>
+</ul>
+</li>
+</ul>
+<h3 id="legatura-dintre-tablouri-si-pointeri"><a class="header" href="#legatura-dintre-tablouri-si-pointeri">Legatura dintre tablouri si pointeri</a></h3>
+<p>Numele unui tablou este un pointer constant spre primul sau element.
+Expresiile de mai jos sunt deci echivalente:</p>
+<ul>
+<li>nume_tablou</li>
+<li>&amp;nume_tablou</li>
+<li>&amp;nume_tablou[0]</li>
+<li>*nume_tablou</li>
+<li>nume_tablou[0]</li>
+</ul>
+<h3 id="instructiunea-lea-load-effective-address"><a class="header" href="#instructiunea-lea-load-effective-address">Instructiunea LEA (Load Effective address)</a></h3>
+<p>Realizeaza “incarcarea” in operandul destinatie a adresei obiectului din operandul sursa.</p>
+<p>Sintaxa: <code>lea dest, sursa</code></p>
+<h3 id="vector-1d"><a class="header" href="#vector-1d">Vector 1D</a></h3>
+<pre><code class="language-cpp">int v[100];    // static
+int* v = (int*)malloc(100*sizeof(int));    // dinamic
+</code></pre>
+<p><img src="../vector_1d.png" alt="vecto1D"></p>
+<p>Accesarea elementelor unui vector</p>
+<pre><code class="language-cpp">v[i] = 5;
+*(v+i) = 5;
+*((int*)((unsigned)v + sizeof(int)*i)) = 5;
+
+_asm {
+    LEA edi, v
+    MOV ecx, i
+    MOV dword ptr [edi + 4*ecx], 5  
+}
+</code></pre>
+<h3 id="vectori-2dmatrice"><a class="header" href="#vectori-2dmatrice">Vectori 2D(Matrice)</a></h3>
+<pre><code class="language-cpp">#define L 100
+#define C 50
+short m[L][C];
+</code></pre>
+<p><img src="../vector_2d.png" alt="vecto2D"></p>
+<p>Accesarea elementelor unei matrici</p>
+<p>In cazul unei matrici de m[L][C] (L * C elemente de tip short), pentru avea acces la elementul de pe pozitia [i][j] (linia i, coloana j), va trebui sa aflam adresa acestuia.</p>
+<p>“m[i][j]” este echivalent cu: “&amp;m + (i*C+j)*2” (adresa primului element la care adaugam (i * nr_coloane + j), totul inmultit cu dimensiunea elementelor, in cazul nostru 2 octeti pentru short)</p>
+<pre><code class="language-cpp">m[i][j] = 5;
+*(((short*)m[i]) + j) = 5;
+*((short*)m + i*C + j) = 5;
+*((short*)((unsigned)m + i*C*sizeof(short) + j*sizeof(short))) = 5;
+
+_asm {
+    LEA edi, m
+    mov eax, C
+    mov ebx, i
+    mov ecx, j
+    mul ebx
+    add eax, ecx
+    shl eax, 1
+    add edi, eax
+    mov dword ptr [edi], 5
+}
+</code></pre>
+<p>Transmiterea matricei ca parametru unei functii</p>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+#include &lt;malloc.h&gt;
+#define L 10
+#define C 20
+
+int f(int m[][C])
+{
+  // functia returneaza valoarea lui m[0][0]
+  _asm
+  {
+    mov eax, [ebp+8]
+    mov eax, [eax]
+  }
+}
+
+void main()
+{
+    int m[L][C];
+    m[0][0] = 1024000;
+    int x = f(m); // vectorii si matricele se transmit prin referinta
+    printf("%d\n",x); // se afiseaza 1024000
+}
+</code></pre>
+<h2 id="structuri"><a class="header" href="#structuri">Structuri</a></h2>
+<ul>
+<li>adresa unui câmp al unei structuri este formată din
+<ul>
+<li>adresa de început a structurii</li>
+<li>deplasamentul câmpului în cadrul structurii</li>
+</ul>
+</li>
+<li>similar tablourilor</li>
+<li>dar câmpurile unei structuri pot fi de tipuri diferite
+<ul>
+<li>deplasamentul nu mai este dat de un indice</li>
+</ul>
+</li>
+</ul>
+<h3 id="alinierea-structurilor"><a class="header" href="#alinierea-structurilor">Alinierea structurilor</a></h3>
+<ul>
+<li>deplasamentul unui câmp - multiplu de dimensiunea sa
+<ul>
+<li>consecință - pot exista goluri (octeți neutilizați) între câmpuri</li>
+<li>iar dimensiunea structurii poate fi mai mare decât suma dimensiunilor câmpurilor</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-cpp">struct S {
+    char a,b;
+    int c;
+} s;
+</code></pre>
+<ul>
+<li>dimensiunea variabilei s de tip S - 8 octeți</li>
+<li>deplasamente: a - 0, b - 1, c - 4</li>
+</ul>
+<h3 id="accesul-la-campuri"><a class="header" href="#accesul-la-campuri">Accesul la campuri</a></h3>
+<ul>
+<li>cod C</li>
+</ul>
+<pre><code class="language-cpp">s.a=7;
+s.c=22;
+</code></pre>
+<ul>
+<li>traducere în limbaj de asamblare</li>
+</ul>
+<pre><code class="language-cpp">mov byte ptr s,7
+mov dword ptr s+4,22
+// sau mov dword ptr s[4],22
+</code></pre>
+<h3 id="structuri-ca-parametri-de-funcții"><a class="header" href="#structuri-ca-parametri-de-funcții">Structuri ca parametri de funcții</a></h3>
+<ul>
+<li>
+<p>limbajul C nu permite transmiterea de structuri ca parametri ai unor funcții</p>
+<ul>
+<li>doar pointeri la structuri</li>
+</ul>
+</li>
+<li>
+<p>în limbajul C++ este posibil</p>
+</li>
+<li>
+<p>cum traducem operatorul -&gt; ?</p>
+<ul>
+<li>determinarea deplasamentului</li>
+<li>dereferențierea</li>
+</ul>
+</li>
+<li>
+<p>cod C</p>
+</li>
+</ul>
+<pre><code class="language-cpp">S *p=new S;
+p-&gt;b=11;
+</code></pre>
+<ul>
+<li>traducere în limbaj de asamblare</li>
+</ul>
+<pre><code class="language-cpp">mov eax,p
+mov byte ptr [eax+1],11
+</code></pre>
+<h2 id="exercitii-10"><a class="header" href="#exercitii-10">Exercitii</a></h2>
+<ol>
+<li>Interschimbarea a 2 valori</li>
+</ol>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+
+void swap (int *a, int *b)
+{
+     _asm
+     {
+        // completati
+     }
+}
+
+void main()
+{
+    int a=2, b=3;
+    swap(&amp;a, &amp;b);
+    printf("%d %d", a, b);
+}
+</code></pre>
+<ol start="2">
+<li>Lungimea unui sir de caractere (un sir de caractere se termina cu valoarea 0)</li>
+</ol>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+int lungime(char *)
+{
+     _asm
+     {
+        // completati
+     }
+}
+
+void main()
+{
+     char *sir="zigyzagy";
+     int l;
+
+     _asm
+     {
+        // completati
+     }
+
+     printf("Lungime: %d %d\n", l, strlen(sir));
+}
+</code></pre>
+<ol start="3">
+<li>Suma elementelor pare dintr-un vector</li>
+</ol>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+
+int suma_pare_vector (int *, int )
+{
+     _asm
+     {
+        // completati
+     }
+}
+
+void main()
+{
+     int v[5]={5,1,2,3,6};
+     int *p=v;
+     int s;
+
+     _asm
+     {
+        // completati
+     }
+
+     printf("Suma: %d", s);
+}
+</code></pre>
+<ol start="5">
+<li>Construirea matricii unitate (1 pe diagonala, 0 in rest)</li>
+</ol>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+
+void matrice_unitate(int *, int )
+{
+     _asm
+     {
+        // completati
+     }
+}
+
+void main()
+{
+     int n=5;
+     int mat[5][5];
+     int *p = mat[0];
+
+     _asm
+     {
+        // completati
+     }
+
+     for(int i=0; i&lt;n; i++)
+     {
+         for(int j=0; j&lt;n; j++)
+            printf("%d ", mat[i][j]);
+         printf ("\n");
+     }
+}
+</code></pre>
 
                     </main>
 
