@@ -45,7 +45,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-51b6922f.js";
+            window.path_to_searchindex_js = "searchindex-bdeb983b.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-891d1d10.js"></script>
@@ -389,25 +389,29 @@ void main()
 <li>Lungimea unui sir de caractere (un sir de caractere se termina cu valoarea 0)</li>
 </ol>
 <pre><code class="language-cpp">#include &lt;stdio.h&gt;
-int lungime(char *)
+#include &lt;cstring&gt;
+int lungime(char*)
 {
-     _asm
-     {
+    _asm
+    {
         // completati
-     }
+    }
+    return 0; // stergeti asta si returnati folosind eax
 }
 
-void main()
+int main()
 {
-     char *sir="zigyzagy";
-     int l;
+    char temp[] = "zigyzagy";
+    char* sir = temp;
+    int l = 0;
 
-     _asm
-     {
+    _asm
+    {
         // completati
-     }
+    }
 
-     printf("Lungime: %d %d\n", l, strlen(sir));
+    printf("Lungime: %d %d\n", l, strlen(sir));
+    return 0;
 }
 </code></pre>
 <ol start="3">
@@ -437,7 +441,7 @@ void main()
      printf("Suma: %d", s);
 }
 </code></pre>
-<ol start="5">
+<ol start="4">
 <li>Construirea matricii unitate (1 pe diagonala, 0 in rest)</li>
 </ol>
 <pre><code class="language-cpp">#include &lt;stdio.h&gt;
