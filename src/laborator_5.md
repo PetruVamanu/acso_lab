@@ -194,25 +194,29 @@ void main()
 2. Lungimea unui sir de caractere (un sir de caractere se termina cu valoarea 0)
 ```cpp
 #include <stdio.h>
-int lungime(char *)
+#include <cstring>
+int lungime(char*)
 {
-     _asm
-     {
+    _asm
+    {
         // completati
-     }
+    }
+    return 0; // stergeti asta si returnati folosind eax
 }
 
-void main()
+int main()
 {
-     char *sir="zigyzagy";
-     int l;
+    char temp[] = "zigyzagy";
+    char* sir = temp;
+    int l = 0;
 
-     _asm
-     {
+    _asm
+    {
         // completati
-     }
+    }
 
-     printf("Lungime: %d %d\n", l, strlen(sir));
+    printf("Lungime: %d %d\n", l, strlen(sir));
+    return 0;
 }
 ```
 
@@ -243,7 +247,7 @@ void main()
 }
 ```
 
-5. Construirea matricii unitate (1 pe diagonala, 0 in rest)
+4. Construirea matricii unitate (1 pe diagonala, 0 in rest)
 ```cpp
 #include <stdio.h>
 
