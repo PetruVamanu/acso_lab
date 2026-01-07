@@ -46,10 +46,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-bdeb983b.js";
+            window.path_to_searchindex_js = "searchindex-26ea49c6.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-891d1d10.js"></script>
+        <script src="toc-255866df.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -1951,6 +1951,399 @@ void main()
      }
 }
 </code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="laboator-6"><a class="header" href="#laboator-6">Laboator 6</a></h1>
+<h1 id="instructiuni-de-lucru-in-virgula-mobila"><a class="header" href="#instructiuni-de-lucru-in-virgula-mobila">Instructiuni de lucru in virgula mobila</a></h1>
+<ul>
+<li>unitatea de virgulă mobilă
+<ul>
+<li>prezentă încă de la primele procesoare Intel</li>
+<li>set complex de instrucțiuni</li>
+<li>dificil de programat</li>
+</ul>
+</li>
+<li>extensii
+<ul>
+<li>MMX</li>
+<li>SIMD</li>
+<li>subseturi de instrucțiuni cu operații uzuale</li>
+</ul>
+</li>
+</ul>
+<h2 id="extensile-simd"><a class="header" href="#extensile-simd">Extensile SIMD</a></h2>
+<p>SIMD - Single Instruction, Multiple Data</p>
+<ul>
+<li>capabile să aplice aceeași operație în paralel pe mai mulți operanzi</li>
+<li>aici ne interesează doar capacitatea de a lucra cu operanzi în virgulă mobilă</li>
+</ul>
+<h3 id="registri"><a class="header" href="#registri">Registri</a></h3>
+<ul>
+<li>8 regiștri dedicați</li>
+<li>XMM0, XMM1, …, XMM7</li>
+<li>fiecare registru are 128 biți
+<ul>
+<li>poate reține simultan 4 valori în simplă precizie</li>
+<li>există instrucțiuni care lucrează cu cele 4 valori în paralel</li>
+<li>aici ne interesează instrucțiunile scalare - lucrează cu o singură valoare</li>
+</ul>
+</li>
+</ul>
+<h3 id="atribuire"><a class="header" href="#atribuire">Atribuire</a></h3>
+<ul>
+<li>se referă exclusiv la valori în virgulă mobilă</li>
+<li>sintaxa</li>
+</ul>
+<pre><code>movss xmm_i,xmm_j
+movss xmm_i,adresa
+movss adresa,xmm_i
+</code></pre>
+<ul>
+<li>primul operand reprezintă destinația</li>
+</ul>
+<p>Ex:</p>
+<pre><code>float f1,f2;
+f1=f2;
+_asm {
+    movss xmm0,f2
+    movss f1,xmm0
+}
+</code></pre>
+<h3 id="instructiuni-de-conversie"><a class="header" href="#instructiuni-de-conversie">Instructiuni de conversie</a></h3>
+<h4 id="trecerea-valorilor-întregi-în-virgulă-mobilă"><a class="header" href="#trecerea-valorilor-întregi-în-virgulă-mobilă">Trecerea valorilor întregi în virgulă mobilă</a></h4>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>cvtsi2ss xmm_i,adresa
+cvtsi2ss xmm_i,registru
+</code></pre>
+<ul>
+<li>registrul care apare în a doua formă a instrucțiunii este din setul de bază, pe 32 biți (EAX, EBX, …)</li>
+</ul>
+<h4 id="trecerea-valorilor-în-virgulă-mobilă-în-întregi"><a class="header" href="#trecerea-valorilor-în-virgulă-mobilă-în-întregi">Trecerea valorilor în virgulă mobilă în întregi</a></h4>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>cvtss2si registru,xmm_i
+cvtss2si registru,adresa
+</code></pre>
+<ul>
+<li>toate celelalte instrucțiuni lucrează exclusiv cu operanzi în virgulă mobilă</li>
+</ul>
+<h3 id="adunare"><a class="header" href="#adunare">Adunare</a></h3>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>addss xmm_i,xmm_j
+addss xmm_i,adresa
+</code></pre>
+<ul>
+<li>adună valorile celor doi operanzi și depune rezultatul în primul operand</li>
+</ul>
+<h3 id="scadere"><a class="header" href="#scadere">Scadere</a></h3>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>subss xmm_i,xmm_j
+subss xmm_i,adresa
+</code></pre>
+<ul>
+<li>scade valoarea celui de-al doilea operand din valoarea primului și depune rezultatul în primul operand</li>
+</ul>
+<h3 id="inmultire--impartire"><a class="header" href="#inmultire--impartire">Inmultire / Impartire</a></h3>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>mulss xmm_i,xmm_j
+mulss xmm_i,adresa
+divss xmm_i,xmm_j
+divss xmm_i,adresa
+</code></pre>
+<ul>
+<li>primul operand este și destinația rezultatului</li>
+</ul>
+<h3 id="extragere-radical"><a class="header" href="#extragere-radical">Extragere radical</a></h3>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>sqrtss xmm_i,xmm_j
+sqrtss xmm_i,adresa
+</code></pre>
+<ul>
+<li>primul operand este destinația rezultatului</li>
+<li>al doilea operand furnizează valoarea a cărei rădăcină pătrată este calculată</li>
+</ul>
+<h3 id="instrucțiuni-logice"><a class="header" href="#instrucțiuni-logice">Instrucțiuni logice</a></h3>
+<pre><code>andps xmm_i,xmm_j
+andps xmm_i,adresa
+orps xmm_i,xmm_j
+orps xmm_i,adresa
+xorps xmm_i,xmm_j
+xorps xmm_i,adresa
+</code></pre>
+<h3 id="comparatii"><a class="header" href="#comparatii">Comparatii</a></h3>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>comiss xmm_i,xmm_j
+comiss xmm_i,adresa
+</code></pre>
+<ul>
+<li>instrucțiunea setează indicatorii de condiții</li>
+</ul>
+<h3 id="valorile-indicatorilor-de-condiții"><a class="header" href="#valorile-indicatorilor-de-condiții">Valorile indicatorilor de condiții</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th style="text-align: left">Relație între operanzi</th><th style="text-align: center">Zero</th><th style="text-align: center">Carry</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: left">operand 1 &gt; operand 2</td><td style="text-align: center">0</td><td style="text-align: center">0</td></tr>
+<tr><td style="text-align: left">operand 1 &lt; operand 2</td><td style="text-align: center">0</td><td style="text-align: center">1</td></tr>
+<tr><td style="text-align: left">operand 1 = operand 2</td><td style="text-align: center">1</td><td style="text-align: center">0</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="exemplu"><a class="header" href="#exemplu">Exemplu:</a></h3>
+<ul>
+<li>calculul distanței între două puncte, date prin coordonatele lor</li>
+</ul>
+<pre><code class="language-cpp">float x1,y1; // primul punct
+float x2,y2; // al doilea punct
+float rez;
+rez=sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+</code></pre>
+<pre><code class="language-asm">_asm {
+    movss xmm0,x2
+    subss xmm0,x1
+    mulss xmm0,xmm0
+    movss xmm1, y2
+    subss xmm1, y1
+    mulss xmm1, xmm1
+
+    addss xmm1,xmm0
+    sqrtss xmm0,xmm1
+    movss rez,xmm0
+}
+</code></pre>
+<h2 id="unitatea-de-virgulă-mobilă"><a class="header" href="#unitatea-de-virgulă-mobilă">Unitatea de virgulă mobilă</a></h2>
+<p>Deși programarea unității de virgulă mobilă este mai dificilă, are o serie de avantaje</p>
+<ul>
+<li>poate lucra și cu valori în dublă precizie</li>
+<li>instrucțiuni de inițializare cu unele constante</li>
+<li>instrucțiuni care implementează funcții trigonometrice</li>
+<li>funcțiile care returnează valori în virgulă mobilă folosesc vârful stivei pentru returnare</li>
+</ul>
+<p>Floating Point Unit - FPU</p>
+<ul>
+<li>inițial - separată de procesor
+<ul>
+<li>inclusă în procesor începând cu Intel 486</li>
+</ul>
+</li>
+<li>lucrează intern cu operanzi în precizie extinsă (80 de biți)</li>
+<li>orice operand de tip float sau double este convertit la această reprezentare</li>
+</ul>
+<h3 id="regiștrii-interni"><a class="header" href="#regiștrii-interni">Regiștrii interni</a></h3>
+<p>8 regiștri pe 80 de biți
+- denumiri: ST(0), ST(1), …, ST(7)</p>
+<ul>
+<li>
+<p>sunt organizați într-o stivă</p>
+<ul>
+<li>ST(0) este întotdeauna vârful stivei</li>
+<li>referit și ca ST</li>
+</ul>
+</li>
+<li>
+<p>orice operație de scriere în stivă schimbă ordinea (și numele) regiștrilor</p>
+<ul>
+<li>fostul ST(0) devine ST(1) etc.</li>
+</ul>
+</li>
+<li>
+<p>la orice instrucțiune, ST(0) este unul dintre operanzi</p>
+<ul>
+<li>sau singurul, la operațiile unare</li>
+</ul>
+</li>
+<li>
+<p>celălalt operand poate fi, după caz</p>
+<ul>
+<li>o locație de memorie (valoare întreagă sau în virgulă mobilă)</li>
+<li>un alt registru ST(i)</li>
+<li>niciodată o constantă</li>
+</ul>
+</li>
+<li>
+<p>introducerea în stivă - prin instrucțiuni de încărcare a unor valori</p>
+<ul>
+<li>locații de memorie</li>
+<li>unele constante predefinite</li>
+</ul>
+</li>
+<li>
+<p>scoaterea din stivă</p>
+<ul>
+<li>multe instrucțiuni de procesare au și o variantă care elimină ST(0) din stivă</li>
+<li>numele acestor instrucțiuni se termină cu “p”</li>
+</ul>
+</li>
+</ul>
+<h4 id="încărcare-din-memorie"><a class="header" href="#încărcare-din-memorie">Încărcare din memorie</a></h4>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>fld adresa
+fild adresa
+</code></pre>
+<ul>
+<li>introduce în stivă operandul, care este
+<ul>
+<li>în primul caz - o variabilă în virgulă mobilă (float, double)</li>
+<li>în al doilea caz - o variabilă întreagă (short int, int)</li>
+</ul>
+</li>
+<li>pentru introducerea unei constante predefinite se folosesc:
+<ul>
+<li>fldz (0)</li>
+<li>fld1 (1)</li>
+<li>fldpi (pi)</li>
+<li>există și alte constante (logaritmice)</li>
+</ul>
+</li>
+</ul>
+<p>Ex:</p>
+<pre><code>float f;
+int i;
+_asm {
+    fld f
+    fild i
+    fld dword ptr [ebp+8]
+}
+</code></pre>
+<h4 id="scriere-în-memorie"><a class="header" href="#scriere-în-memorie">Scriere în memorie</a></h4>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>fst adresa
+fstp [adresa]
+</code></pre>
+<ul>
+<li>scriere ST(0) într-o variabilă în virgulă mobilă</li>
+</ul>
+<pre><code>fist adresa
+fistp adresa
+</code></pre>
+<ul>
+<li>scriere ST(0) într-o variabilă întreagă</li>
+</ul>
+<p>Ex:</p>
+<pre><code>float f;
+int i;
+_asm fstp f;
+</code></pre>
+<ul>
+<li>copiază ST(0) în f și îl elimină din stivă</li>
+<li>fostul ST(1) devine ST(0) etc.</li>
+</ul>
+<pre><code>_asm fist i;
+</code></pre>
+<ul>
+<li>copiază ST(0) în i, păstrându-l pe stivă</li>
+</ul>
+<h4 id="interschimbare-regiștri"><a class="header" href="#interschimbare-regiștri">Interschimbare regiștri</a></h4>
+<ul>
+<li>sintaxa</li>
+</ul>
+<pre><code>fxch st(i)
+</code></pre>
+<ul>
+<li>i este o valoare constantă între 1 și 7</li>
+<li>schimbă între ele valorile regiștrilor ST(0) și ST(i)</li>
+</ul>
+<h4 id="instrucțiuni-trigonometrice"><a class="header" href="#instrucțiuni-trigonometrice">Instrucțiuni trigonometrice</a></h4>
+<pre><code>fsin
+fcos
+</code></pre>
+<ul>
+<li>calculează sinusul, respectiv cosinusul valorii din ST(0) și îl depune tot în ST(0)</li>
+</ul>
+<pre><code>fsincos
+</code></pre>
+<ul>
+<li>depune sinusul valorii din ST(0) în ST(0), iar cosinusul îl adaugă în vârful stivei</li>
+</ul>
+<pre><code>fptan
+</code></pre>
+<ul>
+<li>calculează tangenta valorii din ST(0) și o depune tot în ST(0)</li>
+<li>apoi adaugă valoarea 1.0 în vârful stivei</li>
+</ul>
+<pre><code>fpatan
+</code></pre>
+<ul>
+<li>calculează arctangenta valorii ST(1)/ST(0)</li>
+<li>depune rezultatul în ST(1) și elimină vârful stivei</li>
+</ul>
+<h2 id="concluzii"><a class="header" href="#concluzii">Concluzii</a></h2>
+<ul>
+<li>de preferat lucrul cu instrucțiunile SIMD</li>
+<li>se apelează la FPU în cazuri rare
+<ul>
+<li>cel mai important - returnarea unei valori în virgulă mobilă de către o funcție</li>
+</ul>
+</li>
+<li>dar valoarea poate fi calculată în prealabil prin instrucțiuni SIMD</li>
+<li>atenție: orice valoare încărcată în stiva FPU trebuie eliminată ulterior</li>
+</ul>
+<h2 id="exercitii-11"><a class="header" href="#exercitii-11">Exercitii:</a></h2>
+<ol>
+<li>Sa se scrie in limbaj de asamblare o functie definita astfel:</li>
+</ol>
+<pre><code>float computeFormula(float a, float b);
+</code></pre>
+<p>in cadrul functie se poate utiliza variabila aux pentru a transfera valori intre registrii SIMD si stiva FPU</p>
+<p>Functia calculeaza si returneaza valoarea <code>sin(a + b)</code> utilizand urmatoarea formula:</p>
+<pre><code>sin(a + b) = sin(a) * cos(b) + cos(a) * sin(b)
+</code></pre>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+using namespace std;
+float computeFormula(float, float)
+{
+    float aux;
+    _asm
+    {
+    }
+}
+
+int main()
+{
+    float a = 0.7853f, b = 0.7853f; //pentru aceste valori, functia ar trebui sa returneze 1
+
+    cout &lt;&lt; "sin(a + b) = " &lt;&lt; computeFormula(a, b);
+    return 0;
+}
+</code></pre>
+<ol start="2">
+<li>Conversie de temperatură</li>
+</ol>
+<p>Scrieți un program care convertește temperatura din grade Celsius în grade Fahrenheit folosind instrucțiuni SIMD (movss, mulss, addss).</p>
+<p>Formula: $F = C \times 1.8 + 32$</p>
+<pre><code class="language-cpp">float celsius = 25.0f;
+float factor = 1.8f;
+float constant = 32.0f;
+float fahrenheit;
+</code></pre>
+<ol start="3">
+<li>Calculul ariei cercului</li>
+</ol>
+<p>Folosiți FPU pentru a calcula aria unui cerc ($A = \pi \times r^2$). Utilizați instrucțiunea specială fldpi pentru a încărca valoarea lui $\pi$.</p>
+<ol start="4">
+<li>Rezolvarea ecuației de gradul I</li>
+</ol>
+<p>Creati o functie care calculeaza $x$ din ecuația $ax + b = 0$, unde $a$ și $b$ sunt float, iar $a \neq 0$.
+Rezultatul trebuie returnat prin stiva FPU (așa cum fac funcțiile în C++).</p>
+<p>Formula: $x = -b / a$</p>
 
                     </main>
 
